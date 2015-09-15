@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+     android:paddingTop="20dp"
+    android:orientation="vertical" >
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1" >
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:text="アラーム音"
+                android:textColor="#111111"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/soundView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="soundA"
+                android:textColor="#111111"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/soundSetButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="変更" />
+        </TableRow>
+    </TableLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dp"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/alarmSettingBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="戻る" />
+    </LinearLayout>
+
+</LinearLayout>

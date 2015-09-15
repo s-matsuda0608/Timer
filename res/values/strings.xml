@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="app_name">Timer</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="musicSetting">アラーム音設定</string>
+    <string name="noticeSetting">予告アラーム設定</string>
+    <string name="initTime">00</string>
+    <string name="colon">:</string>
+    <string name="startButton">START</string>
+    <string name="stopButton">STOP</string>
+    <string name="resetButton">RESET</string>
+    <string name="noticeSettingButton">予告アラーム設定</string>
+
+
+
+</resources>

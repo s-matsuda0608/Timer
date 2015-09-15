@@ -1,0 +1,84 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TableLayout
+        android:id="@+id/noticeSettingTable"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="0" >
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            <TableLayout
+                android:id="@+id/noticeContentTable"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:stretchColumns="1" >
+                <TableRow
+                    android:id="@+id/timeRow"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="2dp"
+                    android:background="#b0c4de"
+                    android:onClick="setNoticeTime" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textSize="17sp"
+                        android:text="時間" />
+                    <TextView
+                        android:id="@+id/timeValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="00:05:00"
+                        android:textColor="#000000"
+                        android:textSize="17sp" />
+                </TableRow>
+                <TableRow
+                    android:id="@+id/alarmRow"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="2dp"
+                    android:background="#ffc0cb"
+                    android:onClick="setNoticeSound" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textSize="17sp"
+                        android:text="アラーム音" />
+                    <TextView
+                        android:id="@+id/soundValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Sound 1"
+                        android:textColor="#000000"
+                        android:textSize="17sp" />
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/delButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:onClick="deleteRow"
+                android:textSize="17sp"
+                android:text="削除" />
+        </TableRow>
+    </TableLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#000000" />
+
+</LinearLayout>
