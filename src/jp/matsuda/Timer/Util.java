@@ -46,4 +46,20 @@ public class Util {
 			return 0;
 		}
 	}
+
+	public static boolean hasTimeError(int hour, int min, int sec){
+		if(min >= 60 || sec >= 60 || (hour+min+sec)<=0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public static boolean hasTimeError(String hour, String min, String sec) {
+		try {
+			return hasTimeError(Integer.parseInt(hour), Integer.parseInt(min), Integer.parseInt(sec));
+		} catch (NumberFormatException e) {
+			return true;
+		}
+	}
 }

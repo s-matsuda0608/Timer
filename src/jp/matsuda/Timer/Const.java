@@ -23,8 +23,8 @@ public class Const {
 
 	//各種メッセージ
 	final static String END_MSG = "時間になりました\n「OK」を押してアラームを止めてください";
-	final static String TIME_ERROR1= "入力された時間が不正です。";
-	final static String TIME_ERROR2= "その値は設定できません。";
+	final static String NOTICE_MSG = "予告アラームです。\n「OK」を押してアラームを止めてください";
+	final static String TIME_ERROR= "入力された時間が不正です。";
 
 	//ダイアログのボタン
 	final static String OK = "OK";

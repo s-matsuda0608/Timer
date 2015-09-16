@@ -245,6 +245,12 @@ public class NoticeSettingActivity extends AppCompatActivity{
 		//ビュー設定
 		LayoutInflater inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
 		final View layout = inflater.inflate(R.xml.notice_time_setting, (ViewGroup)findViewById(R.id.layout_root));
+		final EditText hour = (EditText) layout.findViewById(R.id.hour);
+		final EditText min = (EditText) layout.findViewById(R.id.minute);
+		final EditText sec = (EditText) layout.findViewById(R.id.second);
+		hour.setText(noticeList.get(number).getHour());
+		min.setText(noticeList.get(number).getMin());
+		sec.setText(noticeList.get(number).getSec());
 
 		//ダイアログ生成
 		AlertDialog .Builder builder = new AlertDialog.Builder(this);
@@ -254,39 +260,23 @@ public class NoticeSettingActivity extends AppCompatActivity{
 		builder.setPositiveButton(Const.OK, new OnClickListener () {
 			public void onClick(DialogInterface dialog, int which) {
 				//入力された値を取得
-				EditText hour = (EditText) layout.findViewById(R.id.hour);
-				EditText min = (EditText) layout.findViewById(R.id.minute);
-				EditText sec = (EditText) layout.findViewById(R.id.second);
+				String hourStr = Util.timeFormat(hour.getText().toString());
+				String minStr = Util.timeFormat(min.getText().toString());
+				String secStr = Util.timeFormat(sec.getText().toString());
 
-				//Stringに直す
-				String hourStr = hour.getText().toString();
-				String minStr = min.getText().toString();
-				String secStr = sec.getText().toString();
+				if (Util.hasTimeError(hourStr, minStr, secStr)) {
+					Toast.makeText(getApplicationContext(),Const.TIME_ERROR, Toast.LENGTH_SHORT).show();
 
-				//intに直す
-				int hourInt = 0;
-				int minInt = 0;
-				int secInt = 0;
-				try {
-					hourInt = Integer.parseInt(hourStr);
-					minInt = Integer.parseInt(minStr);
-					secInt = Integer.parseInt(secStr);
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
-
-				if (minInt<60 && secInt<60 && (hourInt+minInt+secInt)!=0) {
+				}else {
 					//リストに保存
 					noticeList.get(number).setHour(hourStr);
 					noticeList.get(number).setMin(minStr);
 					noticeList.get(number).setSec(secStr);
 					//画面表示用
-					String timeStr = Util.makeTimeView(hourInt, minInt, secInt);
+					String timeStr = Util.makeTimeView(hourStr, minStr, secStr);
 					//画面に表示
 					timeView.setText(timeStr);
 
-				}else {
-					Toast.makeText(getApplicationContext(),Const.TIME_ERROR2, Toast.LENGTH_SHORT).show();
 				}
 
 			}

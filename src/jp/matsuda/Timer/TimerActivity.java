@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -22,9 +24,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-import jp.matsuda.Timer.R;
 
 public class TimerActivity extends AppCompatActivity {
 
@@ -34,7 +37,6 @@ public class TimerActivity extends AppCompatActivity {
 	private EditText secText;
 	private Button startAndStopButton;
 	private Button resetButton;
-	private Button noticeSettingButton;
 
 	//ステート
 	private int status;
@@ -45,15 +47,18 @@ public class TimerActivity extends AppCompatActivity {
 	//アプリの設定関連
 	SharedPreferences sharedPref;
 	private int alarmId;
-	private String alarmName;
 	private int dataSize;
 	private boolean noticeAlarmEnable;
 	private ArrayList<NoticeData> noticeList = new ArrayList<NoticeData>();
 
 	private MediaPlayer sound = new MediaPlayer();
+	private MediaPlayer noticeSound = new MediaPlayer();
+
+	private boolean ringingNoticeSound = false;
 
 	private MyCountDownTimer cdt;
-	private final int interval = 500;
+	private final int interval = 250;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,7 @@ public class TimerActivity extends AppCompatActivity {
 		setListener();
 		status = ST_DISABLE;
 
+		setSound();
 		setNoticeAlarmView();
 
 
@@ -99,7 +105,6 @@ public class TimerActivity extends AppCompatActivity {
 
 		//そのほか読み込み
 		alarmId = sharedPref.getInt(Const.ALARM_ID, 0);
-		alarmName = sharedPref.getString(Const.ALARM_NAME, "");
 		noticeAlarmEnable = sharedPref.getBoolean(Const.NOTICE_ALARM_ENABLE, false);
 	}
 
@@ -142,14 +147,19 @@ public class TimerActivity extends AppCompatActivity {
 				if(status==ST_DISABLE || status==ST_PAUSE){
 
 					//時間取得＆ミリ秒に変換
-					int ms = Util.timeToMilliSec(hourText.getText().toString(), minText.getText().toString(), secText.getText().toString());
+					String hour = hourText.getText().toString();
+					String min =  minText.getText().toString();
+					String sec = secText.getText().toString();
+					int ms = Util.timeToMilliSec(hour, min, sec);
 
-					if(ms == 0){
-						Toast.makeText(getApplicationContext(), Const.TIME_ERROR1, Toast.LENGTH_SHORT).show();
+					if(Util.hasTimeError(hour, min, sec)){
+						Toast.makeText(getApplicationContext(), Const.TIME_ERROR, Toast.LENGTH_SHORT).show();
 						timerInitialize();
 
 					}else{
 						startAndStopButton.setText(R.string.stopButton);
+						GradientDrawable gd = (GradientDrawable) startAndStopButton.getBackground();
+						gd.setColor(0xffff0000);
 						status = ST_ENABLE;
 						setEnabled(false);
 						cdt = new MyCountDownTimer(ms,interval);
@@ -160,10 +170,11 @@ public class TimerActivity extends AppCompatActivity {
 				}else if(status==ST_ENABLE){
 					cdt.cancel();
 					startAndStopButton.setText(R.string.startButton);
+					GradientDrawable gd = (GradientDrawable) startAndStopButton.getBackground();
+					gd.setColor(0xff228b22);
 					status = ST_PAUSE;
 				}
 			}
-
 		});
 
 		resetButton.setOnClickListener(new View.OnClickListener() {
@@ -175,22 +186,22 @@ public class TimerActivity extends AppCompatActivity {
 				timerInitialize();
 			}
 		});
-
-		noticeSettingButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v){
-				Intent intent = new Intent();
-				intent.setClassName(Const.PACKAGE_NAME, Const.NOTICE_SETTING_ACTIVITY);
-				startActivity(intent);
-			}
-		});
 	}
 
-
+	private void setOutLineOnTimerView(int colorCode) {
+		((LinearLayout)hourText.getParent()).setBackgroundColor(colorCode);
+		((LinearLayout)minText.getParent()).setBackgroundColor(colorCode);
+		((LinearLayout)secText.getParent()).setBackgroundColor(colorCode);
+	}
 
 	private void timerInitialize() {
+
 		startAndStopButton.setText(R.string.startButton);
+		GradientDrawable gd = (GradientDrawable) startAndStopButton.getBackground();
+		gd.setColor(0xff228b22);
+
 		setEnabled(true);
+		setOutLineOnTimerView(Color.BLACK);
 		hourText.setText(R.string.initTime);
 		minText.setText(R.string.initTime);
 		secText.setText(R.string.initTime);
@@ -204,7 +215,6 @@ public class TimerActivity extends AppCompatActivity {
 		minText.setFocusableInTouchMode(bool);
 		secText.setFocusable(bool);
 		secText.setFocusableInTouchMode(bool);
-		noticeSettingButton.setEnabled(bool);
 	}
 
 	private void findView() {
@@ -213,7 +223,6 @@ public class TimerActivity extends AppCompatActivity {
 		secText = (EditText) findViewById(R.id.secEdit);
 		startAndStopButton = (Button)findViewById(R.id.startAndStop);
 		resetButton = (Button)findViewById(R.id.resetButton);
-		noticeSettingButton = (Button)findViewById(R.id.noticeSettingButton);
 	}
 
 	@Override
@@ -257,7 +266,7 @@ public class TimerActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-
+		//オプションメニューを開くたびに呼ばれる
 		menu.findItem(R.id.musicSetting).setEnabled(status == ST_DISABLE);
 		menu.findItem(R.id.noticeSetting).setEnabled(status == ST_DISABLE);
 
@@ -265,10 +274,7 @@ public class TimerActivity extends AppCompatActivity {
 	}
 
 	public void ringAlarm(){
-
-		sound = MediaPlayer.create(this, R.raw.sound1);// 音楽ファイルを読み込み
-		sound.setLooping(true); // ループ設定
-		sound.seekTo(0); // 再生位置を0ミリ秒に指定
+		// TODO 予告アラームのメソッド(新しく作る？)
 
 		sound.start();
 
@@ -289,8 +295,49 @@ public class TimerActivity extends AppCompatActivity {
 		alertDlg.create().show();
 	}
 
+	public void ringNoticeAlarm(int i){
+
+		ringingNoticeSound = true;
+
+		noticeSound = MediaPlayer.create(this, Const.SOUNDS_PATH[noticeList.get(i).getNoticeAlarmId()]);
+		noticeSound.setLooping(true);
+		noticeSound.seekTo(0);
+
+		noticeSound.start();
+
+		final int num = i;
+
+		AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
+		alertDlg.setTitle("予告");
+		alertDlg.setMessage(Const.END_MSG);
+		alertDlg.setPositiveButton("OK", null);
+
+		alertDlg.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				noticeSound.stop();
+				ringingNoticeSound = false;
+				LinearLayout noticeView = (LinearLayout) findViewById(R.id.noticeView);
+				TableRow tr = (TableRow)((TableLayout) noticeView.getChildAt(num)).getChildAt(0);
+				((TextView)tr.getChildAt(0)).setTextColor(Color.GRAY);
+				((TextView)tr.getChildAt(1)).setTextColor(Color.GRAY);
+			}
+		});
+
+		// 表示
+		alertDlg.create().show();
+	}
+
+	public void setSound(){
+		sound = MediaPlayer.create(this, Const.SOUNDS_PATH[alarmId]);// 音楽ファイルを読み込み
+		sound.setLooping(true); // ループ設定
+		sound.seekTo(0); // 再生位置を0ミリ秒に指定
+	}
+
 	public void onUserLeaveHint(){
 		sound.stop();
+		noticeSound.stop();
+		ringingNoticeSound = false;
 	}
 
 	public class MyCountDownTimer extends CountDownTimer{
@@ -303,22 +350,33 @@ public class TimerActivity extends AppCompatActivity {
 		public void onFinish() {
 			// カウントダウン完了後に呼ばれる
 			ringAlarm();
-			Toast.makeText(getApplicationContext(), "終了", Toast.LENGTH_SHORT).show();
 			timerInitialize();
 		}
 
 		@Override
 		public void onTick(long millisUntilFinished) {
 			// インターバル(countDownInterval)毎に呼ばれる
-			// TODO
 
-			int hour = (int)Math.ceil(millisUntilFinished/1000)/60/60;
-			int min = (int)Math.ceil(millisUntilFinished/1000)/60;
-			int sec = (int)Math.ceil(millisUntilFinished/1000)%60;
+			String hour = Util.timeFormat((int)millisUntilFinished/1000/60/60);
+			String min = Util.timeFormat((int)millisUntilFinished/1000/60);
+			String sec = Util.timeFormat((int)millisUntilFinished/1000%60);
 
-			hourText.setText(Util.timeFormat(hour));
-			minText.setText(Util.timeFormat(min));
-			secText.setText(Util.timeFormat(sec));
+			hourText.setText(hour);
+			minText.setText(min);
+			secText.setText(sec);
+			System.out.println("count : "+hour+":"+min+":"+sec);
+
+			if( ! ringingNoticeSound){
+				for(int i=0; i<noticeList.size(); i++){
+					NoticeData nd = noticeList.get(i);
+					System.out.println("notice : "+nd.getHour()+":"+nd.getMin()+":"+nd.getSec());
+					if(hour.equals(nd.getHour()) && min.equals(nd.getMin()) && sec.equals(nd.getSec())){
+						ringNoticeAlarm(i);
+						break;
+					}
+				}
+			}
+
 		}
 	}
 
