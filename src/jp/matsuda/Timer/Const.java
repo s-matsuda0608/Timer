@@ -18,7 +18,8 @@ public class Const {
 	final static String ALARM_SETTING_ACTIVITY = "jp.matsuda.Timer.AlarmSettingActivity";
 
 	//アラーム音選択用
-	final static CharSequence[] SOUNDS_ARRAY = {"sound 1", "sound 2", "sound 3"};
+	final static CharSequence[] SOUNDS_ARRAY = {"sound 0", "sound 1", "sound 2","sound 3","sound 4"};
+	final static int[] SOUNDS_PATH = {R.raw.sound0,R.raw.sound1,R.raw.sound2,R.raw.sound3,R.raw.sound4};
 
 	//各種メッセージ
 	final static String END_MSG = "時間になりました\n「OK」を押してアラームを止めてください";
