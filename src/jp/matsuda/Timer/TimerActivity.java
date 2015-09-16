@@ -57,7 +57,7 @@ public class TimerActivity extends AppCompatActivity {
 	private boolean ringingNoticeSound = false;
 
 	private MyCountDownTimer cdt;
-	private final int interval = 250;
+	private final int interval = 100;
 
 
 	@Override
@@ -71,7 +71,7 @@ public class TimerActivity extends AppCompatActivity {
 		setListener();
 		status = ST_DISABLE;
 
-		setSound();
+
 		setNoticeAlarmView();
 
 
@@ -274,7 +274,10 @@ public class TimerActivity extends AppCompatActivity {
 	}
 
 	public void ringAlarm(){
-		// TODO 予告アラームのメソッド(新しく作る？)
+
+		sound = MediaPlayer.create(this, Const.SOUNDS_PATH[alarmId]);// 音楽ファイルを読み込み
+		sound.setLooping(true); // ループ設定
+		sound.seekTo(0); // 再生位置を0ミリ秒に指定
 
 		sound.start();
 
@@ -328,11 +331,6 @@ public class TimerActivity extends AppCompatActivity {
 		alertDlg.create().show();
 	}
 
-	public void setSound(){
-		sound = MediaPlayer.create(this, Const.SOUNDS_PATH[alarmId]);// 音楽ファイルを読み込み
-		sound.setLooping(true); // ループ設定
-		sound.seekTo(0); // 再生位置を0ミリ秒に指定
-	}
 
 	public void onUserLeaveHint(){
 		sound.stop();
@@ -357,19 +355,17 @@ public class TimerActivity extends AppCompatActivity {
 		public void onTick(long millisUntilFinished) {
 			// インターバル(countDownInterval)毎に呼ばれる
 
-			String hour = Util.timeFormat((int)millisUntilFinished/1000/60/60);
-			String min = Util.timeFormat((int)millisUntilFinished/1000/60);
-			String sec = Util.timeFormat((int)millisUntilFinished/1000%60);
+			String hour = Util.timeFormat(((int)millisUntilFinished/1000)/60/60);
+			String min = Util.timeFormat(((int)millisUntilFinished/1000)/60);
+			String sec = Util.timeFormat(((int)millisUntilFinished/1000)%60);
 
 			hourText.setText(hour);
 			minText.setText(min);
 			secText.setText(sec);
-			System.out.println("count : "+hour+":"+min+":"+sec);
 
 			if( ! ringingNoticeSound){
 				for(int i=0; i<noticeList.size(); i++){
 					NoticeData nd = noticeList.get(i);
-					System.out.println("notice : "+nd.getHour()+":"+nd.getMin()+":"+nd.getSec());
 					if(hour.equals(nd.getHour()) && min.equals(nd.getMin()) && sec.equals(nd.getSec())){
 						ringNoticeAlarm(i);
 						break;
