@@ -42,7 +42,7 @@ public class NoticeSettingActivity extends AppCompatActivity{
 		setContentView(R.layout.activity_notice_setting);
 
 		findView();
-		getPref();
+		loadPreferences();
 		createView();
 
 		setListener();
@@ -59,7 +59,7 @@ public class NoticeSettingActivity extends AppCompatActivity{
 	}
 
 	//アプリの設定を読み込む
-	private void getPref() {
+	private void loadPreferences() {
 
 		sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		editor = sharedPref.edit();

@@ -1,6 +1,10 @@
 package jp.matsuda.Timer;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import com.google.gson.Gson;
 
@@ -72,7 +76,7 @@ public class TimerActivity extends AppCompatActivity {
 		status = ST_DISABLE;
 
 
-		setNoticeAlarmView();
+		renderNoticeAlarmView();
 
 
 	}
@@ -108,7 +112,7 @@ public class TimerActivity extends AppCompatActivity {
 		noticeAlarmEnable = sharedPref.getBoolean(Const.NOTICE_ALARM_ENABLE, false);
 	}
 
-	private void setNoticeAlarmView() {
+	private void renderNoticeAlarmView() {
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		final LinearLayout noticeViewLinear = (LinearLayout) findViewById(R.id.noticeView);
@@ -160,6 +164,7 @@ public class TimerActivity extends AppCompatActivity {
 						startAndStopButton.setText(R.string.stopButton);
 						GradientDrawable gd = (GradientDrawable) startAndStopButton.getBackground();
 						gd.setColor(0xffff0000);
+						setFrameColorOnTimerView(Color.WHITE);
 						status = ST_ENABLE;
 						setEnabled(false);
 						cdt = new MyCountDownTimer(ms,interval);
@@ -188,7 +193,7 @@ public class TimerActivity extends AppCompatActivity {
 		});
 	}
 
-	private void setOutLineOnTimerView(int colorCode) {
+	private void setFrameColorOnTimerView(int colorCode) {
 		((LinearLayout)hourText.getParent()).setBackgroundColor(colorCode);
 		((LinearLayout)minText.getParent()).setBackgroundColor(colorCode);
 		((LinearLayout)secText.getParent()).setBackgroundColor(colorCode);
@@ -201,7 +206,7 @@ public class TimerActivity extends AppCompatActivity {
 		gd.setColor(0xff228b22);
 
 		setEnabled(true);
-		setOutLineOnTimerView(Color.BLACK);
+		setFrameColorOnTimerView(Color.BLACK);
 		hourText.setText(R.string.initTime);
 		minText.setText(R.string.initTime);
 		secText.setText(R.string.initTime);
@@ -354,11 +359,26 @@ public class TimerActivity extends AppCompatActivity {
 		@Override
 		public void onTick(long millisUntilFinished) {
 			// インターバル(countDownInterval)毎に呼ばれる
+			long ms =millisUntilFinished + 1000;
+			Date date = new Date(ms);
 
-			String hour = Util.timeFormat(((int)millisUntilFinished/1000)/60/60);
-			String min = Util.timeFormat(((int)millisUntilFinished/1000)/60);
-			String sec = Util.timeFormat(((int)millisUntilFinished/1000)%60);
+			SimpleDateFormat hh = new SimpleDateFormat("HH",Locale.JAPAN);
+			hh.setTimeZone(TimeZone.getTimeZone("GMT"));
+			SimpleDateFormat mm = new SimpleDateFormat("mm",Locale.JAPAN);
+			mm.setTimeZone(TimeZone.getTimeZone("GMT"));
+			SimpleDateFormat ss = new SimpleDateFormat("ss",Locale.JAPAN);
+			ss.setTimeZone(TimeZone.getTimeZone("GMT"));
 
+			String hour = hh.format(date);
+			String min = mm.format(date);
+			String sec = ss.format(date);
+
+			System.out.println(hour+min+sec);
+
+			/*String hour = Util.timeFormat(((int)ms/1000)/60/60);
+			String min = Util.timeFormat(((int)ms/1000)/60);
+			String sec = Util.timeFormat(((int)ms/1000)%60);
+*/
 			hourText.setText(hour);
 			minText.setText(min);
 			secText.setText(sec);
